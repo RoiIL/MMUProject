@@ -46,7 +46,7 @@ public class Page<T> implements Serializable
 	{
 		boolean isEquals = false;
 
-		if (this == obj || m_pageId == ((Page<T>)obj).getPageId())
+		if (this == obj || m_pageId.equals(((Page<T>)obj).getPageId()))
 		{
 			isEquals = true;
 		}
