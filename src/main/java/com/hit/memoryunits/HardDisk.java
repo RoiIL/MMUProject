@@ -10,7 +10,7 @@ import java.util.HashMap;
 
 public class HardDisk 
 {
-	public static final String DEFAULT_FILE_NAME = "HD";
+	public static final String DEFAULT_FILE_NAME = "HdPages";
 	private static int _SIZE = 1000;
 	private static HardDisk m_instance = null;
 	HashMap<Long, Page<byte[]>> dataOnFile;
@@ -22,12 +22,7 @@ public class HardDisk
 		{
 			dataOnFile.put(i, new Page<byte[]>(i, i.toString().getBytes()));
 		}
-		
-		FileOutputStream hdFile = new FileOutputStream(DEFAULT_FILE_NAME);
-		ObjectOutputStream writeData = new ObjectOutputStream(hdFile);
-		writeData.writeObject(dataOnFile);
-		writeData.flush();
-		hdFile.close();
+		writeDataToHd();
 	}
 	
 	public static HardDisk getInstance() throws IOException
@@ -40,40 +35,39 @@ public class HardDisk
 		return m_instance;
 	}
 	
-	@SuppressWarnings("unchecked")
 	public Page<byte[]> pageFault(Long pageId) throws FileNotFoundException, IOException
 	{
-		FileInputStream fileInput = new FileInputStream(DEFAULT_FILE_NAME);
-		ObjectInputStream hdInputFile = new ObjectInputStream(fileInput);
-		try 
-		{
-			dataOnFile = (HashMap<Long, Page<byte[]>>) hdInputFile.readObject();
-		} 
-		catch (ClassNotFoundException e) 
-		{
-			e.printStackTrace();
-		}
-		finally 
-		{
-			fileInput.close();
-		}
-		
+		readDataFromHd();
 		Page<byte[]> pageToReturn = dataOnFile.get(pageId);
-		
-		FileOutputStream hdFile = new FileOutputStream(DEFAULT_FILE_NAME);
-		ObjectOutputStream writeData = new ObjectOutputStream(hdFile);
 		dataOnFile.remove(pageId);
-		writeData.writeObject(dataOnFile);
-		writeData.flush();
-		hdFile.close();
+		writeDataToHd();
 		
 		return pageToReturn;
 	}
 	
-	@SuppressWarnings("unchecked")
 	public Page<byte[]> pageReplacement(Page<byte[]> moveToHdPage, Long moveToRamId) throws FileNotFoundException, IOException
 	{
-		HashMap<Long, Page<byte[]>> dataOnFile = new HashMap<>();
+		readDataFromHd();
+		dataOnFile.put(moveToHdPage.getPageId(), moveToHdPage);
+		Page<byte[]> pageToReturn = dataOnFile.get(moveToRamId);
+		dataOnFile.remove(moveToRamId);
+		writeDataToHd();
+		
+		return pageToReturn;
+	}
+	
+	private void writeDataToHd() throws FileNotFoundException, IOException
+	{
+		FileOutputStream hdFile = new FileOutputStream(DEFAULT_FILE_NAME);
+		ObjectOutputStream writeData = new ObjectOutputStream(hdFile);
+		writeData.writeObject(dataOnFile);
+		writeData.flush();
+		hdFile.close();
+	}
+	
+	@SuppressWarnings("unchecked")
+	private void readDataFromHd() throws FileNotFoundException, IOException
+	{
 		FileInputStream fileInput = new FileInputStream(DEFAULT_FILE_NAME);
 		ObjectInputStream hdInputFile = new ObjectInputStream(fileInput);
 		try 
@@ -88,17 +82,5 @@ public class HardDisk
 		{
 			fileInput.close();
 		}
-		
-		dataOnFile.put(moveToHdPage.getPageId(), moveToHdPage);
-		Page<byte[]> pageToReturn = dataOnFile.get(moveToRamId);
-		dataOnFile.remove(moveToRamId);
-		
-		FileOutputStream hdFile = new FileOutputStream(DEFAULT_FILE_NAME);
-		ObjectOutputStream writeData = new ObjectOutputStream(hdFile);
-		writeData.writeObject(dataOnFile);
-		writeData.flush();
-		hdFile.close();
-		
-		return pageToReturn;
 	}
 }
