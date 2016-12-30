@@ -10,7 +10,7 @@ import java.util.HashMap;
 
 public class HardDisk 
 {
-	public static final String DEFAULT_FILE_NAME = "HdPages";
+	public static final String DEFAULT_FILE_NAME = "src/main/resources/harddisk/HdPages";
 	private static int _SIZE = 1000;
 	private static HardDisk m_instance = null;
 	HashMap<Long, Page<byte[]>> dataOnFile;
@@ -39,7 +39,6 @@ public class HardDisk
 	{
 		readDataFromHd();
 		Page<byte[]> pageToReturn = dataOnFile.get(pageId);
-		dataOnFile.remove(pageId);
 		writeDataToHd();
 		
 		return pageToReturn;
@@ -50,7 +49,6 @@ public class HardDisk
 		readDataFromHd();
 		dataOnFile.put(moveToHdPage.getPageId(), moveToHdPage);
 		Page<byte[]> pageToReturn = dataOnFile.get(moveToRamId);
-		dataOnFile.remove(moveToRamId);
 		writeDataToHd();
 		
 		return pageToReturn;
@@ -58,11 +56,25 @@ public class HardDisk
 	
 	private void writeDataToHd() throws FileNotFoundException, IOException
 	{
-		FileOutputStream hdFile = new FileOutputStream(DEFAULT_FILE_NAME);
-		ObjectOutputStream writeData = new ObjectOutputStream(hdFile);
-		writeData.writeObject(dataOnFile);
-		writeData.flush();
-		hdFile.close();
+		//String hdFileFullName = this.getClass().getResource(DEFAULT_FILE_NAME).getFile();
+		FileOutputStream hdFile = null;
+		ObjectOutputStream writeData = null;
+		try
+		{
+			hdFile = new FileOutputStream(DEFAULT_FILE_NAME);
+			writeData = new ObjectOutputStream(hdFile);
+			writeData.writeObject(dataOnFile);
+			writeData.flush();
+		}
+		catch (FileNotFoundException exception)
+		{
+			System.out.println("The HardDrive could not be found. System created one.");
+		}
+		finally
+		{
+			writeData.close();
+			hdFile.close();
+		}
 	}
 	
 	@SuppressWarnings("unchecked")
@@ -74,13 +86,14 @@ public class HardDisk
 		{
 			dataOnFile = (HashMap<Long, Page<byte[]>>) hdInputFile.readObject();
 		} 
-		catch (ClassNotFoundException e) 
+		catch (ClassNotFoundException exception) 
 		{
-			e.printStackTrace();
+			exception.printStackTrace();
 		}
 		finally 
 		{
 			fileInput.close();
+			hdInputFile.close();
 		}
 	}
 }
