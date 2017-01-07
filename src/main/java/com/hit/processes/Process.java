@@ -28,23 +28,26 @@ public class Process implements Runnable
 	{	
 		for (ProcessCycle processCycle : processCycles.getProcessCycles()) 
 		{
-			List<Long> pagesList = processCycle.getPages();
-			Long[] pageIds = pagesList.toArray(new Long[pagesList.size()]);
-			Page<byte[]>[] pagesFromMmu = null;
-			try 
+			synchronized (mmu) 
 			{
-				pagesFromMmu = mmu.getPages(pageIds);
-			} 
-			catch (IOException e) 
-			{		
-				e.printStackTrace();
-			}
-			
-			int pageIndex = 0;
-			for (byte[] data : processCycle.getData()) 
-			{
-				pagesFromMmu[pageIndex].setContent(data);
-				pageIndex++;
+				List<Long> pagesList = processCycle.getPages();
+				Long[] pageIds = pagesList.toArray(new Long[pagesList.size()]);
+				Page<byte[]>[] pagesFromMmu = null;
+				try 
+				{
+					pagesFromMmu = mmu.getPages(pageIds);
+				} 
+				catch (IOException e) 
+				{		
+					e.printStackTrace();
+				}
+				
+				int pageIndex = 0;
+				for (byte[] data : processCycle.getData()) 
+				{
+					pagesFromMmu[pageIndex].setContent(data);
+					pageIndex++;
+				}
 			}
 			
 			try 
@@ -56,6 +59,8 @@ public class Process implements Runnable
 				e.printStackTrace();
 			}
 		}
+		
+		System.out.println("Process " + id + " is done");
 	}
 	
 	public int getId()

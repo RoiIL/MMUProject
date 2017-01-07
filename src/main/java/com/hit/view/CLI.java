@@ -34,61 +34,74 @@ public class CLI
 		}
 		while (!isValid);
 		
-		int ramCapacityIndex = 0;
-		String[] algoChoiceAndCapacity;
-		String algo;
-		do 
+		if (userInput.equals("start"))
 		{
-			System.out.println("Please enter required algorithm and RAM capacity: ");
-			System.out.println("(LRU / MFU / Second Chance)");
-			userInput = scanner.nextLine();
-			ramCapacityIndex = 1;
-			algoChoiceAndCapacity = userInput.split(" ");
-			algo = algoChoiceAndCapacity[0].toLowerCase();
-			if (algo.equals("second"))
+			int ramCapacityIndex = 0;
+			String[] algoChoiceAndCapacity;
+			String algo;
+			do 
 			{
-				algo = algo + " " + algoChoiceAndCapacity[1].toLowerCase();
-				ramCapacityIndex++;
-			}
-	
-			if (!algo.equals("lru")&& !algo.equals("mfu") && !algo.equals("second chance"))
-			{
-				System.out.println("ERROR! Not a valid algoithm name");
-				isValid = false;
-			}
-			
-			if (isValid)
-			{
-				if (algoChoiceAndCapacity.length > ramCapacityIndex + 1 || algoChoiceAndCapacity.length < 2)
+				isValid = true;
+				System.out.println("Please enter required algorithm and RAM capacity: ");
+				System.out.println("(LRU / MFU / Second Chance)");
+				userInput = scanner.nextLine();
+				ramCapacityIndex = 1;
+				algoChoiceAndCapacity = userInput.split(" ");
+				algo = algoChoiceAndCapacity[0].toLowerCase();
+				if (algo.equals("second"))
 				{
-					System.out.println("ERROR! You have entered too many argument");
+					algo = algo + " " + algoChoiceAndCapacity[1].toLowerCase();
+					ramCapacityIndex++;
+				}
+		
+				if (!algo.equals("lru")&& !algo.equals("mfu") && !algo.equals("second chance"))
+				{
+					System.out.println("ERROR! Not a valid algoithm name");
 					isValid = false;
 				}
 				
 				if (isValid)
 				{
-					try
+					if (algoChoiceAndCapacity.length > ramCapacityIndex + 1)
 					{
-						Integer.parseInt(algoChoiceAndCapacity[ramCapacityIndex]);
-					}
-					catch (NumberFormatException exception)
-					{
-						System.out.println("ERROR! Not a valid value for RAM capacity");
+						System.out.println("ERROR! You have entered too many arguments");
 						isValid = false;
+					}
+					if ((algo.equals("second chance") && algoChoiceAndCapacity.length == 2) || algoChoiceAndCapacity.length < 2)
+					{
+						System.out.println("ERROR! You are missing arguments");
+						isValid = false;
+					}
+					
+					if (isValid)
+					{
+						try
+						{
+							Integer.parseInt(algoChoiceAndCapacity[ramCapacityIndex]);
+						}
+						catch (NumberFormatException exception)
+						{
+							System.out.println("ERROR! Not a valid value for RAM capacity");
+							isValid = false;
+						}
 					}
 				}
 			}
+			while (!isValid);
+			
+			System.out.println("Processing...");
+			
+			if (algo.equals("second chance"))
+			{
+				String[] algoSecondChance = new String[]{"secondChance", algoChoiceAndCapacity[ramCapacityIndex]};
+				return algoSecondChance;
+			}
+			return algoChoiceAndCapacity;
 		}
-		while (!isValid);
-		
-		System.out.println("Processing...");
-		
-		if (algo.equals("second chance"))
+		else
 		{
-			String[] algoSecondChance = new String[]{"secondChance", algoChoiceAndCapacity[ramCapacityIndex]};
-			return algoSecondChance;
+			return null;
 		}
-		return algoChoiceAndCapacity;
 	}
 	
 	public void write(String string)

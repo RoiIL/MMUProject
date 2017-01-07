@@ -1,27 +1,26 @@
 package com.hit.processes;
 
-import java.util.ArrayList;
 import java.util.List;
 
 public class RunConfiguration 
 {
-	private List<ProcessCycles> processCycles;
+	private List<ProcessCycles> processesCycles;
 
-	public RunConfiguration(List<ProcessCycles> processCycles) {
-		this.processCycles = processCycles;
+	public RunConfiguration(List<ProcessCycles> processesCycles) {
+		this.processesCycles = processesCycles;
 	}
 
 	public List<ProcessCycles> getProcessCycles() {
-		return processCycles;
+		return processesCycles;
 	}
 
-	public void setProcessCycles(List<ProcessCycles> processCycles) {
-		this.processCycles = processCycles;
+	public void setProcessCycles(List<ProcessCycles> processesCycles) {
+		this.processesCycles = processesCycles;
 	}
 	
 	@Override
 	public String toString()
 	{
-		return processCycles.toArray().toString();
+		return processesCycles.toArray().toString();
 	}
 }
