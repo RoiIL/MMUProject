@@ -56,7 +56,6 @@ public class HardDisk
 	
 	private void writeDataToHd() throws FileNotFoundException, IOException
 	{
-		//String hdFileFullName = this.getClass().getResource(DEFAULT_FILE_NAME).getFile();
 		FileOutputStream hdFile = null;
 		ObjectOutputStream writeData = null;
 		try

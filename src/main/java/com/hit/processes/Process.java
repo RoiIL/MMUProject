@@ -36,6 +36,7 @@ public class Process implements Runnable
 				try 
 				{
 					pagesFromMmu = mmu.getPages(pageIds);
+					System.out.println("Pages from mmu: " + Arrays.asList(pagesFromMmu));
 				} 
 				catch (IOException e) 
 				{		
@@ -45,8 +46,18 @@ public class Process implements Runnable
 				int pageIndex = 0;
 				for (byte[] data : processCycle.getData()) 
 				{
+					try {
 					pagesFromMmu[pageIndex].setContent(data);
 					pageIndex++;
+					}
+					catch (NullPointerException exepction)
+					{
+						exepction.printStackTrace();
+					}
+					catch (ArrayIndexOutOfBoundsException e)
+					{
+						e.printStackTrace();
+					}
 				}
 			}
 			

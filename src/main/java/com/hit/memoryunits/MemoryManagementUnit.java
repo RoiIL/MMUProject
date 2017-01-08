@@ -1,6 +1,7 @@
 package com.hit.memoryunits;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -17,10 +18,13 @@ public class MemoryManagementUnit
 		m_ram = new RAM(ramCapacity);
 	}
 	
+	@SuppressWarnings("unchecked")
 	public Page<byte[]>[] getPages(Long[] pageIds) throws IOException
 	{
-		Page<byte[]> pageToGet;
+		Page<byte[]> pageToGet = null;
+		List<Page<byte[]>> pagesToReturn = new ArrayList<Page<byte[]>>();
 		List<Long> pageIdToHandle;
+
 		for (Long pageId : pageIds) 
 		{
 			if (m_algo.getElement(Arrays.asList(pageId)) == null) 	// the page is not in ram
@@ -39,9 +43,15 @@ public class MemoryManagementUnit
 				}
 				
 				m_ram.addPage(pageToGet);
+				pagesToReturn.add(pageToGet);
 			}
 		}
-		
-		return m_ram.getPages(pageIds);
+
+		if (pagesToReturn.size() != pageIds.length)
+		{
+			System.out.println("something wrong...");
+		}
+		System.out.println(pagesToReturn.toString());
+		return pagesToReturn.toArray(new Page[pagesToReturn.size()]);
 	}
 }

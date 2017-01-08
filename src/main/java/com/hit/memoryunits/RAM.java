@@ -1,5 +1,6 @@
 package com.hit.memoryunits;
 
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -34,9 +35,9 @@ public class RAM
 		m_pagesMap.put(addPage.getPageId(), addPage);
 	}
 	
-	public void removePage(Page<byte[]> removePage)
+	public void removePage(Page<byte[]> pageToRemove)
 	{
-		m_pagesMap.remove(removePage.getPageId());
+		m_pagesMap.remove(pageToRemove.getPageId());
 	}
 	
 	public Page<byte[]>[] getPages(Long[] pageIds)
@@ -48,11 +49,12 @@ public class RAM
 		{
 			if (m_pagesMap.containsKey(pageId))
 			{
-				retPages[index] = getPage(pageId);
+				retPages[index] = m_pagesMap.get(pageId);
 				index++;
 			}
 		}
 		
+		System.out.println(Arrays.asList(retPages));
 		return retPages;
 	}
 	
