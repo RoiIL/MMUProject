@@ -28,6 +28,9 @@ public class Process implements Runnable
 	{	
 		for (ProcessCycle processCycle : processCycles.getProcessCycles()) 
 		{
+			boolean writePages[] = new boolean[processCycle.getPages().size()];
+			Arrays.fill(writePages, true);
+			
 			synchronized (mmu) 
 			{
 				List<Long> pagesList = processCycle.getPages();
@@ -35,8 +38,9 @@ public class Process implements Runnable
 				Page<byte[]>[] pagesFromMmu = null;
 				try 
 				{
-					pagesFromMmu = mmu.getPages(pageIds);
-					System.out.println("Pages from mmu: " + Arrays.asList(pagesFromMmu));
+					System.out.println("Pages requested: " + Arrays.asList(pageIds));
+					pagesFromMmu = mmu.getPages(pageIds, writePages);
+					System.out.println("Pages returned from mmu: " + Arrays.asList(pagesFromMmu));
 				} 
 				catch (IOException e) 
 				{		
@@ -46,18 +50,11 @@ public class Process implements Runnable
 				int pageIndex = 0;
 				for (byte[] data : processCycle.getData()) 
 				{
-					try {
-					pagesFromMmu[pageIndex].setContent(data);
+					if (writePages[pageIndex])
+					{
+						pagesFromMmu[pageIndex].setContent(data);
+					}
 					pageIndex++;
-					}
-					catch (NullPointerException exepction)
-					{
-						exepction.printStackTrace();
-					}
-					catch (ArrayIndexOutOfBoundsException e)
-					{
-						e.printStackTrace();
-					}
 				}
 			}
 			

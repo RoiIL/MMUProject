@@ -39,7 +39,6 @@ public class HardDisk
 	{
 		readDataFromHd();
 		Page<byte[]> pageToReturn = dataOnFile.get(pageId);
-		writeDataToHd();
 		
 		return pageToReturn;
 	}

@@ -19,12 +19,13 @@ public class MemoryManagementUnit
 	}
 	
 	@SuppressWarnings("unchecked")
-	public Page<byte[]>[] getPages(Long[] pageIds) throws IOException
+	public Page<byte[]>[] getPages(Long[] pageIds, boolean[] writePages) throws IOException
 	{
 		Page<byte[]> pageToGet = null;
 		List<Page<byte[]>> pagesToReturn = new ArrayList<Page<byte[]>>();
 		List<Long> pageIdToHandle;
 
+		int pageIndex = 0;
 		for (Long pageId : pageIds) 
 		{
 			if (m_algo.getElement(Arrays.asList(pageId)) == null) 	// the page is not in ram
@@ -39,19 +40,29 @@ public class MemoryManagementUnit
 				{
 					Page<byte[]> pageToReplace = m_ram.getPage(pageIdToHandle.get(0));
 					m_ram.removePage(pageToReplace);
-					pageToGet = HardDisk.getInstance().pageReplacement(pageToReplace, pageId);
+					if (writePages[pageIndex])
+					{
+						pageToGet = HardDisk.getInstance().pageReplacement(pageToReplace, pageId);
+					}
+					else
+					{
+						pageToGet = HardDisk.getInstance().pageFault(pageId);
+					}
 				}
 				
 				m_ram.addPage(pageToGet);
 				pagesToReturn.add(pageToGet);
 			}
+			
+			else
+			{
+				pagesToReturn.add(m_ram.getPage(pageId));
+			}
+			
+			pageIndex++;
 		}
-
-		if (pagesToReturn.size() != pageIds.length)
-		{
-			System.out.println("something wrong...");
-		}
-		System.out.println(pagesToReturn.toString());
+		
+		System.out.println("RAM content: " + m_ram.getPages().toString());
 		return pagesToReturn.toArray(new Page[pagesToReturn.size()]);
 	}
 }

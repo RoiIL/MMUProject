@@ -50,40 +50,67 @@ public class MMUDriver
 			
 			MemoryManagementUnit mmu = new MemoryManagementUnit(capacity, algo);
 			
-			FileReader configFile = null;
-			try {
-				configFile = new FileReader("src/main/resources/configuration/Configuration.json");
-			} catch (FileNotFoundException e) {
-				e.printStackTrace();
-			}
-			
-			RunConfiguration runConfig = new Gson().fromJson(configFile, RunConfiguration.class);
+			RunConfiguration runConfig = readConfigurationFile();
 			List<ProcessCycles> processCyclesList = runConfig.getProcessCycles();
-			List<Process> processList = new ArrayList<>();
-			int processId = 0;
-			for (ProcessCycles processCycles : processCyclesList)
-			{
-				processList.add(new Process(processId, mmu, processCycles));
-				processId++;
-			}
+			List<Process> processes = createProcesses(processCyclesList, mmu);
 			
-			List<Thread> threadList = new ArrayList<>();
-			for (Process process : processList) 
-			{
-				threadList.add(new Thread(process));
-			}
-			
-			for (Thread thread : threadList) 
-			{
-				thread.start();
-			}
-			
-			for (Thread thread : threadList) 
-			{
-				thread.join();
-			}
+			runProcesses(processes);
 		}
 		
 		System.out.println("Done.");
+	}
+	
+	private static RunConfiguration readConfigurationFile()
+	{
+		FileReader configFile = null;
+		try 
+		{
+			configFile = new FileReader("src/main/resources/configuration/Configuration.json");
+		} 
+		catch (FileNotFoundException exception) 
+		{
+			exception.printStackTrace();
+		}
+		
+		return new Gson().fromJson(configFile, RunConfiguration.class);
+	}
+	
+	private static List<Process> createProcesses(List<ProcessCycles> processCyclesList, MemoryManagementUnit mmu)
+	{
+		List<Process> processList = new ArrayList<>();
+		int processId = 0;
+		for (ProcessCycles processCycles : processCyclesList)
+		{
+			processList.add(new Process(processId, mmu, processCycles));
+			processId++;
+		}
+		
+		return processList;
+	}
+	
+	private static void runProcesses(List<Process> processes)
+	{
+		List<Thread> threadList = new ArrayList<>();
+		for (Process process : processes) 
+		{
+			threadList.add(new Thread(process));
+		}
+		
+		for (Thread thread : threadList) 
+		{
+			thread.start();
+		}
+		
+		for (Thread thread : threadList) 
+		{
+			try 
+			{
+				thread.join();
+			} 
+			catch (InterruptedException e) 
+			{
+				e.printStackTrace();
+			}
+		}
 	}
 }

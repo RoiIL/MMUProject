@@ -6,6 +6,7 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.ObjectOutputStream;
+import java.util.Arrays;
 import java.util.HashMap;
 
 import org.junit.Test;
@@ -23,12 +24,14 @@ public class MMUTest {
 		MemoryManagementUnit mmu = new MemoryManagementUnit(5, algo);
 		
 		Long[] pageIds = new Long[] {0L, 1L, 2L, 3L, 4L, 5L, 6L, 7L, 8L};
-		Page<byte[]>[] retPages = mmu.getPages(pageIds);
+		boolean[] writePages = new boolean[pageIds.length];
+		Arrays.fill(writePages, true);
+		Page<byte[]>[] retPages = mmu.getPages(pageIds, writePages);
 		@SuppressWarnings("unchecked")
 		Page<byte[]>[] expected = new Page[9];
 		
-		Long value = 4L;
-		for (int i = 0; i < 5; i++)
+		Long value = 0L;
+		for (int i = 0; i < 9; i++)
 		{
 			expected[i] = new Page<byte[]>(value, value.toString().getBytes());
 			value++;
