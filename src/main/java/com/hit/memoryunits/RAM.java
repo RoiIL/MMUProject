@@ -54,7 +54,6 @@ public class RAM
 			}
 		}
 		
-		System.out.println(Arrays.asList(retPages));
 		return retPages;
 	}
 	

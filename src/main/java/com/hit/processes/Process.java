@@ -50,7 +50,7 @@ public class Process implements Runnable
 				int pageIndex = 0;
 				for (byte[] data : processCycle.getData()) 
 				{
-					if (writePages[pageIndex])
+					if (writePages[pageIndex] && pagesFromMmu[pageIndex] != null) // bug in MFU algo! (the algorithm not my code)
 					{
 						pagesFromMmu[pageIndex].setContent(data);
 					}

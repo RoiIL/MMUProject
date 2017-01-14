@@ -2,19 +2,19 @@ package com.hit.view;
 
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.io.PrintWriter;
 import java.util.Scanner;
 
 public class CLI 
 {
-	InputStream in;
-	OutputStream out;
+	Scanner in;
+	PrintWriter out;
 	Scanner scanner;
 	
 	public CLI(InputStream in, OutputStream out) 
 	{
-		this.in = in;
-		this.out = out;
-		scanner = new Scanner(in);
+		this.in = new Scanner(in);
+		this.out = new PrintWriter(out);
 	}
 	
 	public String[] getConfiguration()
@@ -24,11 +24,11 @@ public class CLI
 		do 
 		{
 			isValid = true;
-			System.out.println("What would you like to do? (stop/start)");
-			userInput = scanner.nextLine();
+			write("What would you like to do? (stop/start)");
+			userInput = in.nextLine();
 			if (!userInput.toLowerCase().equals("start") && !userInput.toLowerCase().equals("stop"))
 			{
-				System.out.println("Please enter 'start' or 'stop' only");
+				write("Please enter 'start' or 'stop' only");
 				isValid = false;
 			}
 		}
@@ -42,9 +42,9 @@ public class CLI
 			do 
 			{
 				isValid = true;
-				System.out.println("Please enter required algorithm and RAM capacity: ");
-				System.out.println("(LRU / MFU / Second Chance)");
-				userInput = scanner.nextLine();
+				write("Please enter required algorithm and RAM capacity: ");
+				write("(LRU / MFU / Second Chance)");
+				userInput = in.nextLine();
 				ramCapacityIndex = 1;
 				algoChoiceAndCapacity = userInput.split(" ");
 				algo = algoChoiceAndCapacity[0].toLowerCase();
@@ -56,7 +56,7 @@ public class CLI
 		
 				if (!algo.equals("lru")&& !algo.equals("mfu") && !algo.equals("second chance"))
 				{
-					System.out.println("ERROR! Not a valid algoithm name");
+					write("ERROR! Not a valid algoithm name");
 					isValid = false;
 				}
 				
@@ -64,12 +64,12 @@ public class CLI
 				{
 					if (algoChoiceAndCapacity.length > ramCapacityIndex + 1)
 					{
-						System.out.println("ERROR! You have entered too many arguments");
+						write("ERROR! You have entered too many arguments");
 						isValid = false;
 					}
 					if ((algo.equals("second chance") && algoChoiceAndCapacity.length == 2) || algoChoiceAndCapacity.length < 2)
 					{
-						System.out.println("ERROR! You are missing arguments");
+						write("ERROR! You are missing arguments");
 						isValid = false;
 					}
 					
@@ -81,7 +81,7 @@ public class CLI
 						}
 						catch (NumberFormatException exception)
 						{
-							System.out.println("ERROR! Not a valid value for RAM capacity");
+							write("ERROR! Not a valid value for RAM capacity");
 							isValid = false;
 						}
 					}
@@ -89,7 +89,7 @@ public class CLI
 			}
 			while (!isValid);
 			
-			System.out.println("Processing...");
+			write("Processing...");
 			
 			if (algo.equals("second chance"))
 			{
@@ -106,7 +106,8 @@ public class CLI
 	
 	public void write(String string)
 	{
-		
+		out.println(string);
+		out.flush();
 	}
 	
 }

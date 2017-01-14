@@ -18,51 +18,102 @@ public class MemoryManagementUnit
 		m_ram = new RAM(ramCapacity);
 	}
 	
-	@SuppressWarnings("unchecked")
 	public Page<byte[]>[] getPages(Long[] pageIds, boolean[] writePages) throws IOException
 	{
-		Page<byte[]> pageToGet = null;
-		List<Page<byte[]>> pagesToReturn = new ArrayList<Page<byte[]>>();
-		List<Long> pageIdToHandle;
-
+		List<Long> returnedPages = m_algo.getElement(Arrays.asList(pageIds));
+		System.out.println(m_algo.toString());
+		List<Long> pagesNotInRam = new ArrayList<>();
+		
 		int pageIndex = 0;
-		for (Long pageId : pageIds) 
+		for (Long pageId : returnedPages) // Collect all pages that are not in the RAM
 		{
-			if (m_algo.getElement(Arrays.asList(pageId)) == null) 	// the page is not in ram
+			if (pageId == null)
 			{
-				pageIdToHandle = m_algo.putElement(Arrays.asList(pageId), Arrays.asList(pageId));
-				
-				if (pageIdToHandle == null) 						// ram is not full, performing page fault
-				{
-					pageToGet = HardDisk.getInstance().pageFault(pageId);
-				}
-				else												// ram is full, performing page replacement
-				{
-					Page<byte[]> pageToReplace = m_ram.getPage(pageIdToHandle.get(0));
-					m_ram.removePage(pageToReplace);
-					if (writePages[pageIndex])
-					{
-						pageToGet = HardDisk.getInstance().pageReplacement(pageToReplace, pageId);
-					}
-					else
-					{
-						pageToGet = HardDisk.getInstance().pageFault(pageId);
-					}
-				}
-				
-				m_ram.addPage(pageToGet);
-				pagesToReturn.add(pageToGet);
+				pagesNotInRam.add(pageIds[pageIndex]);
 			}
-			
-			else
-			{
-				pagesToReturn.add(m_ram.getPage(pageId));
-			}
-			
 			pageIndex++;
 		}
 		
-		System.out.println("RAM content: " + m_ram.getPages().toString());
-		return pagesToReturn.toArray(new Page[pagesToReturn.size()]);
+		// Handling pages that are not in the RAM depends if RAM is full or not
+		Page<byte[]> pageToInsert = null;
+		List<Long> pageIdsToHandle = m_algo.putElement(pagesNotInRam, pagesNotInRam);
+		System.out.println("pages to handle: " + pageIdsToHandle);
+		System.out.println(m_algo.toString());
+		
+		int pageToHandleIndex = 0;
+		for (Long pageIdToHandle : pageIdsToHandle) 
+		{
+			if (pageIdToHandle == null) // Ram is not full and the page can be inserted directly to RAM
+			{
+				pageToInsert = HardDisk.getInstance().pageFault(pagesNotInRam.get(pageToHandleIndex));
+			}
+			else                        // RAM is full, replacing the page
+			{
+				Page<byte[]> pageToReplace = m_ram.getPage(pageIdToHandle); 
+				m_ram.removePage(pageToReplace);
+				System.out.println("Page to remvoe " + pageToReplace);
+				pageToInsert = HardDisk.getInstance().pageReplacement(pageToReplace, pagesNotInRam.get(pageToHandleIndex));
+			}
+			pageToHandleIndex++;
+			System.out.println("page to insert: " + pageToInsert);
+			System.out.println("RAM content before adding: " + m_ram.getPages().toString());
+			m_ram.addPage(pageToInsert);
+			System.out.println("RAM content after adding: " + m_ram.getPages().toString());
+		}
+		
+		
+		//System.out.println("RAM content: " + m_ram.getPages().toString());
+		Page<byte[]>[] pages = m_ram.getPages(pageIds);
+		for (Page<byte[]> page : pages) {
+			if (page == null)
+			{
+				System.out.println("not good");
+			}
+		}
+		
+		return m_ram.getPages(pageIds);
+		
+		//return pagesToReturn.toArray(new Page[pagesToReturn.size()]);
+		
+//		List<Page<byte[]>> pagesToReturn = new ArrayList<Page<byte[]>>();
+//		List<Long> pageIdToHandle;
+//		Page<byte[]> pageToGet = null;
+//		
+//		int pageIndex = 0;
+//		for (Long pageId : pageIds) 
+//		{
+//			if (m_algo.getElement(Arrays.asList(pageId)) == null) 	// the page is not in ram
+//			{
+//				pageIdToHandle = m_algo.putElement(Arrays.asList(pageId), Arrays.asList(pageId));
+//				
+//				if (pageIdToHandle == null) 						// ram is not full, performing page fault
+//				{
+//					pageToGet = HardDisk.getInstance().pageFault(pageId);
+//				}
+//				else												// ram is full, performing page replacement
+//				{
+//					Page<byte[]> pageToReplace = m_ram.getPage(pageIdToHandle.get(0));
+//					m_ram.removePage(pageToReplace);
+//					if (writePages[pageIndex])
+//					{
+//						pageToGet = HardDisk.getInstance().pageReplacement(pageToReplace, pageId);
+//					}
+//					else
+//					{
+//						pageToGet = HardDisk.getInstance().pageFault(pageId);
+//					}
+//				}
+//				
+//				m_ram.addPage(pageToGet);
+//				pagesToReturn.add(pageToGet);
+//			}
+//			
+//			else
+//			{
+//				pagesToReturn.add(m_ram.getPage(pageId));
+//			}
+//			
+//			pageIndex++;
+//		}
 	}
 }
