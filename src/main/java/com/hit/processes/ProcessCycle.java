@@ -1,6 +1,5 @@
 package com.hit.processes;
 
-import java.util.ArrayList;
 import java.util.List;
 
 public class ProcessCycle 

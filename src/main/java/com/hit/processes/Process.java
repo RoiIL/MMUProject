@@ -4,9 +4,6 @@ import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 
-import javax.imageio.stream.MemoryCacheImageOutputStream;
-import javax.swing.plaf.SliderUI;
-
 import com.hit.memoryunits.MemoryManagementUnit;
 import com.hit.memoryunits.Page;
 
@@ -28,13 +25,20 @@ public class Process implements Runnable
 	{	
 		for (ProcessCycle processCycle : processCycles.getProcessCycles()) 
 		{
-			boolean writePages[] = new boolean[processCycle.getPages().size()];
-			Arrays.fill(writePages, true);
+			boolean writePages[] = new boolean[processCycle.getData().size()];
+			
+			int index = 0;
+			for (byte[] pageData : processCycle.getData()) 
+			{
+				writePages[index] = pageData == null ? true : false;
+				index++;;
+			}
 			
 			synchronized (mmu) 
 			{
 				List<Long> pagesList = processCycle.getPages();
 				Long[] pageIds = pagesList.toArray(new Long[pagesList.size()]);
+				
 				Page<byte[]>[] pagesFromMmu = null;
 				try 
 				{

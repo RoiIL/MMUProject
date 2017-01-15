@@ -3,11 +3,8 @@ package com.hit.memoryunits;
 import static org.junit.Assert.*;
 
 import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.ObjectOutputStream;
 import java.util.Arrays;
-import java.util.HashMap;
 
 import org.junit.Test;
 
@@ -45,8 +42,8 @@ public class MMUTest {
 		HardDisk.getInstance();
 		Page<byte[]> page0 = new Page<byte[]>((long) 0, "0".getBytes());
 		Page<byte[]> page1 = new Page<byte[]>((long) 2000, "Hello".getBytes());
-		Page<byte[]> page2 = new Page<byte[]>((long) 4000, "World".getBytes());
-		Page<byte[]> page3 = new Page<byte[]>((long) 6000, "Again".getBytes());
+//		Page<byte[]> page2 = new Page<byte[]>((long) 4000, "World".getBytes());
+//		Page<byte[]> page3 = new Page<byte[]>((long) 6000, "Again".getBytes());
 		
 		Page<byte[]> returnedPage = HardDisk.getInstance().pageReplacement(page1, page0.getPageId());
 		assertEquals(page0, returnedPage);
