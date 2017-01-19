@@ -5,6 +5,9 @@ import java.io.FileReader;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 
 import com.google.gson.Gson;
 import com.hit.algorithm.IAlgoCache;
@@ -90,27 +93,20 @@ public class MMUDriver
 	
 	private static void runProcesses(List<Process> processes)
 	{
-		List<Thread> threadList = new ArrayList<>();
+		ExecutorService executor = Executors.newCachedThreadPool();
 		for (Process process : processes) 
 		{
-			threadList.add(new Thread(process));
+			executor.execute(process);
 		}
 		
-		for (Thread thread : threadList) 
+		executor.shutdown();
+		try 
 		{
-			thread.start();
-		}
-		
-		for (Thread thread : threadList) 
+			executor.awaitTermination(2, TimeUnit.MINUTES);
+		} 
+		catch (InterruptedException e) 
 		{
-			try 
-			{
-				thread.join();
-			} 
-			catch (InterruptedException e) 
-			{
-				e.printStackTrace();
-			}
+			e.printStackTrace();
 		}
 	}
 }
