@@ -3,11 +3,13 @@ package com.hit.driver;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.lang.reflect.InvocationTargetException;
+import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
+import java.util.logging.Level;
 
 import com.google.gson.Gson;
 import com.hit.algorithm.IAlgoCache;
@@ -18,6 +20,7 @@ import com.hit.memoryunits.MemoryManagementUnit;
 import com.hit.processes.Process;
 import com.hit.processes.ProcessCycles;
 import com.hit.processes.RunConfiguration;
+import com.hit.util.MMULogger;
 import com.hit.view.CLI;
 
 public class MMUDriver 
@@ -39,6 +42,8 @@ public class MMUDriver
 			
 			String algoType = configuration[0];
 			capacity = Integer.parseInt(configuration[1]);
+			MMULogger.getInstace().write(MessageFormat.format("RC:{0}\n", capacity), Level.INFO);
+			
 			switch (algoType)
 			{
 			case "lru":
@@ -56,6 +61,7 @@ public class MMUDriver
 			RunConfiguration runConfig = readConfigurationFile();
 			List<ProcessCycles> processCyclesList = runConfig.getProcessCycles();
 			List<Process> processes = createProcesses(processCyclesList, mmu);
+			MMULogger.getInstace().write(MessageFormat.format("PN:{0}\n\n", processes.size()), Level.INFO);
 			
 			runProcesses(processes);
 		}
@@ -72,7 +78,7 @@ public class MMUDriver
 		} 
 		catch (FileNotFoundException exception) 
 		{
-			exception.printStackTrace();
+			MMULogger.getInstace().write(exception.getMessage(), Level.SEVERE);
 		}
 		
 		return new Gson().fromJson(configFile, RunConfiguration.class);
@@ -104,9 +110,9 @@ public class MMUDriver
 		{
 			executor.awaitTermination(2, TimeUnit.MINUTES);
 		} 
-		catch (InterruptedException e) 
+		catch (InterruptedException exception) 
 		{
-			e.printStackTrace();
+			MMULogger.getInstace().write(exception.getMessage(), Level.SEVERE);
 		}
 	}
 }

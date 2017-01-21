@@ -1,11 +1,14 @@
 package com.hit.memoryunits;
 
 import java.io.IOException;
+import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.logging.Level;
 
 import com.hit.algorithm.IAlgoCache;
+import com.hit.util.MMULogger;
 
 public class MemoryManagementUnit 
 {
@@ -46,6 +49,7 @@ public class MemoryManagementUnit
 			if (pageIdToHandle == null) // Ram is not full and the page can be inserted directly to RAM
 			{
 				pageToInsert = HardDisk.getInstance().pageFault(pagesNotInRam.get(pageToHandleIndex));
+				MMULogger.getInstace().write(MessageFormat.format("PF:{0}\n", pagesNotInRam.get(pageToHandleIndex)), Level.INFO);
 			}
 			else                        // RAM is full, replacing the page
 			{
@@ -53,6 +57,7 @@ public class MemoryManagementUnit
 				m_ram.removePage(pageToReplace);
 				System.out.println("Page to remvoe " + pageToReplace);
 				pageToInsert = HardDisk.getInstance().pageReplacement(pageToReplace, pagesNotInRam.get(pageToHandleIndex));
+				MMULogger.getInstace().write(MessageFormat.format("PR:MTH {0} MTR {1}\n", pageIdToHandle, pagesNotInRam.get(pageToHandleIndex)), Level.INFO);
 			}
 			pageToHandleIndex++;
 			System.out.println("page to insert: " + pageToInsert);

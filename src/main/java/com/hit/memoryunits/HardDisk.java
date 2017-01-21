@@ -7,6 +7,9 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.util.HashMap;
+import java.util.logging.Level;
+
+import com.hit.util.MMULogger;
 
 public class HardDisk 
 {
@@ -66,7 +69,7 @@ public class HardDisk
 		}
 		catch (FileNotFoundException exception)
 		{
-			System.out.println("The HardDrive could not be found. System created one.");
+			MMULogger.getInstace().write(exception.getMessage(), Level.SEVERE);
 		}
 		finally
 		{
@@ -86,7 +89,7 @@ public class HardDisk
 		} 
 		catch (ClassNotFoundException exception) 
 		{
-			exception.printStackTrace();
+			MMULogger.getInstace().write(exception.getMessage(), Level.SEVERE);
 		}
 		finally 
 		{

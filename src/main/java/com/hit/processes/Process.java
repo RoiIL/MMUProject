@@ -1,11 +1,14 @@
 package com.hit.processes;
 
 import java.io.IOException;
+import java.text.MessageFormat;
 import java.util.Arrays;
 import java.util.List;
+import java.util.logging.Level;
 
 import com.hit.memoryunits.MemoryManagementUnit;
 import com.hit.memoryunits.Page;
+import com.hit.util.MMULogger;
 
 public class Process implements Runnable 
 {
@@ -46,17 +49,19 @@ public class Process implements Runnable
 					pagesFromMmu = mmu.getPages(pageIds, writePages);
 					System.out.println("Pages returned from mmu: " + Arrays.asList(pagesFromMmu));
 				} 
-				catch (IOException e) 
+				catch (IOException exception) 
 				{		
-					e.printStackTrace();
+					MMULogger.getInstace().write(exception.getMessage(), Level.SEVERE);
 				}
 				
 				int pageIndex = 0;
 				for (byte[] data : processCycle.getData()) 
 				{
-					if (writePages[pageIndex] && pagesFromMmu[pageIndex] != null) // bug in MFU algo! (the algorithm not my code)
+					if (pagesFromMmu[pageIndex] != null) // bug in MFU algo! (the algorithm not my code)
 					{
 						pagesFromMmu[pageIndex].setContent(data);
+						MMULogger.getInstace().write(MessageFormat.format("GP:P{0} {1} {2}\n\n", 
+								id, pagesFromMmu[pageIndex].getPageId(), Arrays.toString(data)), Level.INFO);
 					}
 					pageIndex++;
 				}
