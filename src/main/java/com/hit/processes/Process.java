@@ -57,7 +57,7 @@ public class Process implements Runnable
 				int pageIndex = 0;
 				for (byte[] data : processCycle.getData()) 
 				{
-					if (pagesFromMmu[pageIndex] != null) // bug in MFU algo! (the algorithm not my code)
+					if (pagesFromMmu[pageIndex] != null) // added to handle the bug in MFU algo! (the algorithm, not my code)
 					{
 						pagesFromMmu[pageIndex].setContent(data);
 						MMULogger.getInstace().write(MessageFormat.format("GP:P{0} {1} {2}\n\n", 
@@ -71,9 +71,9 @@ public class Process implements Runnable
 			{
 				Thread.sleep(processCycle.getSleepMs());
 			} 
-			catch (InterruptedException e) 
+			catch (InterruptedException exception) 
 			{
-				e.printStackTrace();
+				MMULogger.getInstace().write(exception.getMessage(), Level.SEVERE);
 			}
 		}
 		
