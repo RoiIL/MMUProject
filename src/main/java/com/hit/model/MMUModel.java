@@ -2,11 +2,15 @@ package com.hit.model;
 
 import java.io.FileNotFoundException;
 import java.io.FileReader;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.text.MessageFormat;
 import java.text.spi.NumberFormatProvider;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Observable;
+import java.util.Scanner;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
@@ -28,12 +32,37 @@ public class MMUModel extends Observable implements Model
 	public int numProcesses;
 	public int ramCapacity;
 	private List<String> data;
+	IAlgoCache<Long, Long> algo;
+	String[] configuration;
 	
 	public MMUModel(String[] configuration)
 	{
 		data = new ArrayList<>();
-		IAlgoCache<Long, Long> algo = null;
-		
+		algo = null;
+		this.configuration = configuration;
+	}
+	
+	public List<String> getCommands()
+	{
+		return data;
+	}
+	
+	@Override
+	public void readData() 
+	{
+		try 
+		{
+			data = Files.readAllLines(Paths.get(MMULogger.DEFAULT_FILE_NAME));
+		} 
+		catch (IOException exception) 
+		{
+			MMULogger.getInstace().write(exception.getMessage(), Level.SEVERE);
+		}
+	}
+
+	@Override
+	public void start() 
+	{
 		String algoType = configuration[0];
 		ramCapacity = Integer.parseInt(configuration[1]);
 		MMULogger.getInstace().write(MessageFormat.format("RC:{0}\n", ramCapacity), Level.INFO);
@@ -59,23 +88,8 @@ public class MMUModel extends Observable implements Model
 		numProcesses = processes.size();
 		
 		runProcesses(processes);
-	}
-	
-	public List<String> getCommands()
-	{
-		return null;
-	}
-	
-	@Override
-	public void readData() 
-	{
-		
-	}
-
-	@Override
-	public void start() 
-	{
-		
+		setChanged();
+		notifyObservers(this);
 	}
 	
 	private static RunConfiguration readConfigurationFile()
