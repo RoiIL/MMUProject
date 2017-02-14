@@ -1,7 +1,9 @@
 package com.hit.view;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Observable;
 
 import javax.swing.JFrame;
@@ -32,10 +34,14 @@ public class MMUView extends Observable implements View
 	public int numProcesses;
 	public int ramCapacity;
 	private List<String> commands;
+	private String singleCommand;
+	private int lineIndex = 2;
+	private int columnIndex = 0;
 	
 	public MMUView()
 	{
 		commands = new ArrayList<>();
+		singleCommand = "";
 	}
 	
 	public void setConfiguration(List<String> commands)
@@ -78,24 +84,75 @@ public class MMUView extends Observable implements View
 		Label pageFaultLable = new Label (pageSection, SWT.TOP);
 		pageFaultLable.setText ("Page Fault Amount:");
 		Label amountOfPageFaultLabel = new Label (pageSection, SWT.NONE);
-		amountOfPageFaultLabel.setText ("3");
+		amountOfPageFaultLabel.setText("3");
 		
 		Label pageReplacementLable = new Label (pageSection, SWT.TOP);
 		pageReplacementLable.setText ("Page Replacement Amount:");
 		Label amountOfPageReplacementLabel = new Label (pageSection, SWT.NONE);
-		amountOfPageReplacementLabel.setText ("1");
+		amountOfPageReplacementLabel.setText("1");
 		
-
-		Button ok = new Button (shell, SWT.PUSH);
-		ok.setText("OK");
-		ok.setSize(10,20);
-		ok.addSelectionListener(new SelectionListener() {
+		table.setLinesVisible (true);
+		table.setHeaderVisible (true);
+		GridData data = new GridData(SWT.NONE, SWT.NONE, false, false);
+		data.heightHint = 100;
+		table.setLayoutData(data);
+		
+		String ramCapacety = commands.get(0);
+		ramCapacety = ramCapacety.replace("RC:", "");
+		String[] pageNumbers = new String[Integer.parseInt(ramCapacety)];
+		for (int i = 0; i < pageNumbers.length; i++) 
+		{
+			TableColumn column = new TableColumn(table, SWT.NONE);
+			column.setText("");
+			column.pack();
+		}
+		
+		Composite buttonsSection = new Composite(shell, SWT.NONE);
+		GridLayout buttonsSectionGrid = new GridLayout(2, false);
+		buttonsSection.setLayout(buttonsSectionGrid);
+		
+		String processesAmount = commands.get(1);
+		ramCapacety = ramCapacety.replace("PN:", "");
+		
+		Button play = new Button (buttonsSection, SWT.PUSH);
+		play.setText("Play");
+		play.addSelectionListener(new SelectionListener() {
 			
 			@Override
 			public void widgetSelected(SelectionEvent arg0) 
 			{
-				ok.setText("PUSHED");				
-				ok.setSize(200,40);
+				List<String> columnToReplace = new ArrayList<>(); 
+				while(!singleCommand.contains("GP:"))
+				{
+					singleCommand = commands.get(lineIndex);
+					lineIndex++;
+					if (singleCommand.contains("PR:"))
+					{
+						columnToReplace.add((singleCommand.substring(singleCommand.indexOf("H"), singleCommand.indexOf("MTR"))).trim());
+					}
+				}
+
+				String pageId = singleCommand.substring(6, singleCommand.indexOf("[") - 1);
+				if (columnToReplace.size() > 0)
+				{
+					columnIndex = Integer.parseInt(columnToReplace.get(0));
+					columnToReplace.remove(0);
+				}
+				table.getColumn(columnIndex).setText(pageId);
+				
+				String dataLine = singleCommand.substring(singleCommand.indexOf("[") + 1, singleCommand.indexOf("]"));
+				String[] data = dataLine.split(",");
+				
+				for (int i = 0; i < data.length; i++) 
+				{
+					TableItem item = new TableItem(table, SWT.NONE);
+					item.setText(columnIndex, data[i]);
+				}
+				
+				if (columnIndex < 5)
+				{
+					columnIndex++;
+				}
 			}
 			
 			@Override
@@ -105,34 +162,10 @@ public class MMUView extends Observable implements View
 			}
 		});
 		
-		table.setLinesVisible (true);
-		table.setHeaderVisible (true);
-		GridData data = new GridData(SWT.NONE, SWT.NONE, false, false);
-		data.heightHint = 100;
-		table.setLayoutData(data);
-		String[] titles = {" ", "C", "!", "Description", "Resource", "In Folder", "Location"};
-		for (int i=0; i<titles.length; i++) {
-			TableColumn column = new TableColumn (table, SWT.NONE);
-			column.setText (titles [i]);
-		}
-		int count = 5;
-		for (int i=0; i<count; i++) {
-			TableItem item = new TableItem (table, SWT.NONE);
-			item.setText (0, "x");
-			item.setText (1, "y");
-			item.setText (2, "!");
-			item.setText (3, "this stuff behaves the way I expect");
-			item.setText (4, "almost everywhere");
-			item.setText (5, "some.folder");
-			item.setText (6, "line " + i + " in nowhere");
-		}
-		for (int i=0; i<titles.length; i++) {
-			table.getColumn (i).pack ();
-		}
+		Button playAll = new Button (buttonsSection, SWT.PUSH);
+		playAll.setText("Play All");
 		
-		Button cancel = new Button (shell, SWT.PUSH);
-		cancel.setText("Cancel");
-		shell.setDefaultButton (cancel);
+		shell.setDefaultButton(play);
 		shell.pack();
 		shell.open ();
 		

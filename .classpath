@@ -7,12 +7,11 @@
 	<classpathentry kind="con" path="org.eclipse.jdt.junit.JUNIT_CONTAINER/4"/>
 	<classpathentry kind="lib" path="lib/CacheAlgorithm.jar"/>
 	<classpathentry kind="lib" path="lib/gson-2.8.0.jar"/>
-	<classpathentry kind="lib" path="lib/swt.jar">
+	<classpathentry kind="lib" path="lib/swt.jar" sourcepath="lib/src.zip">
 		<attributes>
 			<attribute name="javadoc_location" value="jar:platform:/resource/MMUProject/lib/src.zip!/"/>
 		</attributes>
 	</classpathentry>
 	<classpathentry kind="lib" path="lib/swt-debug.jar"/>
-	<classpathentry kind="lib" path="lib/src.zip"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
