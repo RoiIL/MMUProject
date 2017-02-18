@@ -15,27 +15,27 @@ public class HardDisk
 {
 	public static final String DEFAULT_FILE_NAME = "src/main/resources/harddisk/HdPages";
 	private static int _SIZE = 1000;
-	private static HardDisk m_instance = null;
+	private static HardDisk instance = new HardDisk();
 	HashMap<Long, Page<byte[]>> dataOnFile;
 	
-	private HardDisk() throws IOException
+	private HardDisk()
 	{
 		dataOnFile = new HashMap<>();
 		for (Long i = 0L; i < _SIZE; i++)
 		{
 			dataOnFile.put(i, new Page<byte[]>(i, i.toString().getBytes()));
 		}
-		writeDataToHd();
+		try {
+			writeDataToHd();
+		} catch (IOException e) {
+			MMULogger.getInstace().write(e.getMessage(), Level.SEVERE);
+			e.printStackTrace();
+		}
 	}
 	
 	public static HardDisk getInstance() throws IOException
 	{
-		if (m_instance == null)
-		{
-			m_instance = new HardDisk();
-		}
-		
-		return m_instance;
+		return instance;
 	}
 	
 	public Page<byte[]> pageFault(Long pageId) throws FileNotFoundException, IOException
