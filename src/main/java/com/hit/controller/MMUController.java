@@ -5,6 +5,7 @@ import java.util.Observer;
 
 import com.hit.model.MMUModel;
 import com.hit.model.Model;
+import com.hit.util.MMULogger;
 import com.hit.view.MMUView;
 import com.hit.view.View;
 
@@ -24,13 +25,14 @@ public class MMUController implements Controller, Observer
 	{
 		if (o == model)
 		{
+			MMULogger.getInstace().close();
 			view.open();
 		}
 		else if(o == view)
 		{
 			model.readData();
 			((MMUView)view).setConfiguration(((MMUModel)model).getCommands());
-			((MMUView)view).numProcesses = ((MMUModel)model).numProcesses;
+			((MMUView)view).numOfProcesses = ((MMUModel)model).numProcesses;
 			((MMUView)view).ramCapacity = ((MMUModel)model).ramCapacity;
 		}
 	}

@@ -1,5 +1,6 @@
 package com.hit.util;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.logging.FileHandler;
 import java.util.logging.Formatter;
@@ -16,6 +17,11 @@ public class MMULogger
 	{
 		try 
 		{
+			File file = new File(DEFAULT_FILE_NAME);
+			if(file.exists())
+			{
+				file.delete();
+			}
 			handler = new FileHandler(DEFAULT_FILE_NAME);
 			handler.setFormatter(new OnlyMessageFormatter());
 		} 
@@ -52,5 +58,10 @@ public class MMULogger
 		{
 			return record.getMessage();
 		}
+	}
+	
+	public void close()
+	{
+		handler.close();
 	}
 }
