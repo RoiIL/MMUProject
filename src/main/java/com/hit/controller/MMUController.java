@@ -26,6 +26,8 @@ public class MMUController implements Controller, Observer
 		if (o == model)
 		{
 			MMULogger.getInstace().close();
+			System.out.println("");
+			System.out.println("Done.");
 			view.open();
 		}
 		else if(o == view)

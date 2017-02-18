@@ -45,9 +45,7 @@ public class Process implements Runnable
 				Page<byte[]>[] pagesFromMmu = null;
 				try 
 				{
-					System.out.println("Pages requested: " + Arrays.asList(pageIds));
 					pagesFromMmu = mmu.getPages(pageIds, writePages);
-					System.out.println("Pages returned from mmu: " + Arrays.asList(pagesFromMmu));
 				} 
 				catch (IOException exception) 
 				{		
@@ -76,8 +74,6 @@ public class Process implements Runnable
 				MMULogger.getInstace().write(exception.getMessage(), Level.SEVERE);
 			}
 		}
-		
-		System.out.println("Process " + id + " is done");
 	}
 	
 	public int getId()

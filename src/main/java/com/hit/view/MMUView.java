@@ -54,6 +54,8 @@ public class MMUView extends Observable implements View
 	private Integer pageReplacementCounter;
 	private Label amountOfPageFaultLabel;
 	private Label amountOfPageReplacementLabel;
+	private Button play;
+	private Button playAll;
 	
 	public MMUView()
 	{
@@ -88,6 +90,7 @@ public class MMUView extends Observable implements View
 	{
 		Display display = new Display();
 		Shell shell = new Shell(display);
+		shell.setText("Memory Management Unit Project");
 		GridLayout layout = new GridLayout(1, false);
 
 		shell.setSize(750, 600);
@@ -113,13 +116,17 @@ public class MMUView extends Observable implements View
 		pageFaultLable.setText ("Page Fault Amount:");
 		amountOfPageFaultLabel = new Label (pageSection, SWT.NONE);
 		amountOfPageFaultLabel.setText(pageFaultConter.toString());
-		amountOfPageFaultLabel.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false, 1, 1));
+		GridData pageFaultData = new GridData(SWT.FILL, SWT.FILL, true, false, 1, 1);
+		pageFaultData.widthHint = 50;
+		amountOfPageFaultLabel.setLayoutData(pageFaultData);
 		
 		Label pageReplacementLable = new Label (pageSection, SWT.TOP);
 		pageReplacementLable.setText ("Page Replacement Amount:");
 		amountOfPageReplacementLabel = new Label (pageSection, SWT.NONE);
 		amountOfPageReplacementLabel.setText(pageReplacementCounter.toString());
-		amountOfPageReplacementLabel.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false, 1, 1));
+		GridData pageReplacementData = new GridData(SWT.FILL, SWT.FILL, true, false, 1, 1);
+		pageReplacementData.widthHint = 50;
+		amountOfPageReplacementLabel.setLayoutData(pageReplacementData);
 		
 		table.setLinesVisible (true);
 		table.setHeaderVisible (true);
@@ -145,7 +152,7 @@ public class MMUView extends Observable implements View
 			listOfTableItems.add(item);
 		}
 		
-		Button play = new Button(buttonsSection, SWT.PUSH);
+		play = new Button(buttonsSection, SWT.PUSH);
 		play.setText("Play");
 		play.addSelectionListener(new SelectionListener() {
 			
@@ -164,7 +171,7 @@ public class MMUView extends Observable implements View
 			}
 		});
 		
-		Button playAll = new Button (buttonsSection, SWT.PUSH);
+		playAll = new Button (buttonsSection, SWT.PUSH);
 		playAll.setText("Play All");
 		playAll.addSelectionListener(new SelectionListener() {
 			
@@ -194,7 +201,7 @@ public class MMUView extends Observable implements View
 	    
 	    GridData processesData = new GridData(SWT.NONE, SWT.NONE, true, true, 1, 1);
 	    processesData.heightHint = 130;
-	    processesData.widthHint = 120;
+	    processesData.widthHint = 70;
 	    processesTable.setLayoutData(processesData);
 	    
 	    processesTable.addListener(SWT.Selection, new Listener()
@@ -328,12 +335,12 @@ public class MMUView extends Observable implements View
 			PageIdToColumnMap.put(curPage.pageId, columnIndex);
 			pagesInfoMap.put(curPage.pageId ,curPage);
 			
+			String dataLine = singleCommand.substring(singleCommand.indexOf("[") + 1, singleCommand.indexOf("]"));
+			curPage.data = dataLine.split(",");
+			
 			if (curPage.toDisplay)
 			{
 				table.getColumn(columnIndex).setText(curPage.pageId);
-				
-				String dataLine = singleCommand.substring(singleCommand.indexOf("[") + 1, singleCommand.indexOf("]"));
-				curPage.data = dataLine.split(",");
 				
 				for (int i = 0; i < curPage.data.length; i++) 
 				{
@@ -342,6 +349,11 @@ public class MMUView extends Observable implements View
 			}
 			
 			singleCommand = "";
+		}
+		else
+		{
+			play.setEnabled(false);
+			playAll.setEnabled(false);
 		}
 	}
 

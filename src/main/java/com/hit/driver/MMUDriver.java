@@ -30,6 +30,6 @@ public class MMUDriver
 			model.start();
 		}
 		
-		System.out.println("Done.");
+		System.out.println("System is terminated");
 	}
 }

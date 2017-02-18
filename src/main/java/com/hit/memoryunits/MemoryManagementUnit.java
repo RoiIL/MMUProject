@@ -24,8 +24,8 @@ public class MemoryManagementUnit
 	public Page<byte[]>[] getPages(Long[] pageIds, boolean[] writePages) throws IOException
 	{
 		List<Long> returnedPages = m_algo.getElement(Arrays.asList(pageIds));
-		System.out.println(m_algo.toString());
 		List<Long> pagesNotInRam = new ArrayList<>();
+		System.out.print(".");
 		
 		int pageIndex = 0;
 		for (Long pageId : returnedPages) // Collect all pages that are not in the RAM
@@ -40,8 +40,6 @@ public class MemoryManagementUnit
 		// Handling pages that are not in the RAM depends if RAM is full or not
 		Page<byte[]> pageToInsert = null;
 		List<Long> pageIdsToHandle = m_algo.putElement(pagesNotInRam, pagesNotInRam);
-		System.out.println("pages to handle: " + pageIdsToHandle);
-		System.out.println(m_algo.toString());
 		
 		int pageToHandleIndex = 0;
 		for (Long pageIdToHandle : pageIdsToHandle) 
@@ -55,25 +53,11 @@ public class MemoryManagementUnit
 			{
 				Page<byte[]> pageToReplace = m_ram.getPage(pageIdToHandle); 
 				m_ram.removePage(pageToReplace);
-				System.out.println("Page to remvoe " + pageToReplace);
 				pageToInsert = HardDisk.getInstance().pageReplacement(pageToReplace, pagesNotInRam.get(pageToHandleIndex));
 				MMULogger.getInstace().write(MessageFormat.format("PR:MTH {0} MTR {1}\n", pageIdToHandle, pagesNotInRam.get(pageToHandleIndex)), Level.INFO);
 			}
 			pageToHandleIndex++;
-			System.out.println("page to insert: " + pageToInsert);
-			System.out.println("RAM content before adding: " + m_ram.getPages().toString());
 			m_ram.addPage(pageToInsert);
-			System.out.println("RAM content after adding: " + m_ram.getPages().toString());
-		}
-		
-		
-		//System.out.println("RAM content: " + m_ram.getPages().toString());
-		Page<byte[]>[] pages = m_ram.getPages(pageIds);
-		for (Page<byte[]> page : pages) {
-			if (page == null)
-			{
-				System.out.println("not good");
-			}
 		}
 		
 		return m_ram.getPages(pageIds);
